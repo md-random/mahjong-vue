@@ -10,7 +10,7 @@ export const useGameStore = defineStore('game', () => {
     const tilesState = ref<TileState[]>([]);
     const selectedCoords = ref<Coordinate | null>(null);
     const hintCoord = ref<Coordinate | null>(null);
-    const gameState = ref<'start' | 'playing'>('start');
+    const gameState = ref<'intro' | 'start' | 'playing'>('intro');
     const currentLayoutName = ref<string>('Classic Turtle');
 
     const currentCoords = computed<Coordinate[]>(() => 

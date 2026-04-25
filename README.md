@@ -4,9 +4,10 @@ A responsive, web-based Mahjong Solitaire game built with Vue 3, Vite, and TypeS
 
 ## Features
 
-- **Multiple Layouts**: Play classic Mahjong formations including the traditional "Classic Turtle" layout.
-- **Responsive Design**: The game board scales dynamically to fit perfectly on any screen size—from ultrawide desktop monitors down to mobile devices—without breaking the layout or requiring scrolling.
-- **Dynamic Backgrounds**: The game features context-aware dynamic backgrounds with advanced pure CSS masking effects (like the 7-ring water ripple on the start screen).
+- **Brand Experience**: Features a fully integrated MP4 intro video establishing the "Fool Enterprises" gaming universe, seamlessly fading into the main game UI.
+- **Multiple Layouts**: Custom dropdown menu (using Vue `<Teleport>`) to choose between "Classic Turtle", "Deep Well", and "Eight Stacks" tile formations.
+- **Landscape-First Responsive Design**: The game board scales dynamically to fit on any screen size. For mobile devices, it features a custom CSS orientation lock (`RotateDeviceOverlay`) that forces the game into landscape mode for optimal playability.
+- **Dynamic Backgrounds**: The game features context-aware dynamic backgrounds with advanced pure CSS masking effects (like the 7-ring water ripple on the start screen and soft-beveled video masks).
 - **Game State Management**: Robust state handling powered by Pinia, managing tile visibility, matching logic, and hint systems.
 - **Hint System**: Built-in hint system to help you find available moves when you're stuck.
 

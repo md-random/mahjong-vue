@@ -12,12 +12,13 @@
             <p class="subtitle" style="margin-bottom: min(2vh, 15px);">Select a layout and match the tiles to win!</p>
 
             <div class="layout-selector">
-                <label for="layout-select">Choose Layout:</label>
-                <select id="layout-select" v-model="selectedLayout" class="custom-select">
-                    <option v-for="layout in availableLayouts" :key="layout" :value="layout">
-                        {{ layout }}
-                    </option>
-                </select>
+                <label>Choose Layout:</label>
+                <div class="custom-dropdown" @click="toggleDropdown" ref="dropdownRef">
+                    <div class="dropdown-selected">
+                        {{ selectedLayout }}
+                        <span class="chevron" :class="{ 'chevron-up': isDropdownOpen }">▼</span>
+                    </div>
+                </div>
             </div>
             
             <button class="start-btn" @click="startGame">
@@ -29,6 +30,23 @@
             <h2 class="how-to-play-link" @click="showRulesModal = true">How to Play</h2>
         </div>
     </div>
+
+    <Teleport to="body">
+        <div class="dropdown-overlay" v-if="isDropdownOpen" @click="closeDropdown"></div>
+        <Transition name="dropdown-fade">
+            <ul v-if="isDropdownOpen" class="dropdown-options teleported-options" :style="dropdownStyle">
+                <li 
+                    v-for="layout in availableLayouts" 
+                    :key="layout" 
+                    class="dropdown-option"
+                    :class="{ 'active': layout === selectedLayout }"
+                    @click.stop="selectLayout(layout)"
+                >
+                    {{ layout }}
+                </li>
+            </ul>
+        </Transition>
+    </Teleport>
 
     <div class="rules-modal-overlay" v-if="showRulesModal" @click.self="showRulesModal = false">
         <div class="rules-modal">
@@ -44,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import { useGameStore } from '../stores/gameStore';
 import { LAYOUTS } from '../utils/coordinates';
 
@@ -52,6 +70,60 @@ const store = useGameStore();
 const selectedLayout = ref('Classic Turtle');
 const availableLayouts = Object.keys(LAYOUTS);
 const showRulesModal = ref(false);
+const isDropdownOpen = ref(false);
+const dropdownRef = ref<HTMLElement | null>(null);
+const dropdownStyle = ref({ top: '0px', left: '0px', width: '0px' });
+
+const closeDropdown = () => {
+    isDropdownOpen.value = false;
+    window.removeEventListener('resize', updateDropdownPosition);
+    window.removeEventListener('scroll', updateDropdownPosition, true);
+};
+
+const toggleDropdown = () => {
+    if (isDropdownOpen.value) {
+        closeDropdown();
+    } else {
+        isDropdownOpen.value = true;
+        updateDropdownPosition();
+        window.addEventListener('resize', updateDropdownPosition);
+        window.addEventListener('scroll', updateDropdownPosition, true);
+    }
+};
+
+const updateDropdownPosition = () => {
+    if (dropdownRef.value) {
+        const rect = dropdownRef.value.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const dropdownMaxHeight = 260;
+
+        if (spaceBelow < dropdownMaxHeight && rect.top > spaceBelow) {
+            dropdownStyle.value = {
+                top: 'auto',
+                bottom: `${window.innerHeight - rect.top + 8}px`,
+                left: `${rect.left}px`,
+                width: `${rect.width}px`
+            };
+        } else {
+            dropdownStyle.value = {
+                top: `${rect.bottom + 8}px`,
+                bottom: 'auto',
+                left: `${rect.left}px`,
+                width: `${rect.width}px`
+            };
+        }
+    }
+};
+
+const selectLayout = (layout: string) => {
+    selectedLayout.value = layout;
+    closeDropdown();
+};
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateDropdownPosition);
+    window.removeEventListener('scroll', updateDropdownPosition, true);
+});
 
 const startGame = () => {
     store.startGame(selectedLayout.value);
@@ -181,17 +253,97 @@ const startGame = () => {
     font-weight: bold;
 }
 
-.custom-select {
+.custom-dropdown {
+    position: relative;
+    min-width: 160px;
+    max-width: 200px;
+    flex: 1;
+    user-select: none;
+}
+
+.dropdown-selected {
     padding: min(1.2vh, 10px) 15px;
     font-size: clamp(12px, 2vh, 14px);
-    border-radius: 6px;
-    background-color: var(--background-color);
-    color: var(--font-color);
-    border: 1px solid var(--tile-border-color);
-    outline: none;
-    font-family: inherit;
+    border-radius: 8px;
+    background-color: rgba(0, 30, 60, 0.8);
+    color: #00ccff;
+    border: 1px solid #00ccff;
     cursor: pointer;
-    box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.2);
+    transition: all 0.2s ease;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.dropdown-selected:hover {
+    background-color: rgba(0, 50, 100, 0.9);
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+}
+
+.chevron {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.chevron-up {
+    transform: rotate(180deg);
+}
+
+.dropdown-options {
+    position: fixed;
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+    background: rgba(0, 15, 30, 0.98);
+    border: 1px solid #00ccff;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 204, 255, 0.3);
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.dropdown-option {
+    padding: min(1.2vh, 10px) 15px;
+    font-size: clamp(12px, 2vh, 14px);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-option:hover {
+    background-color: rgba(0, 204, 255, 0.2);
+    color: #00ccff;
+}
+
+.dropdown-option.active {
+    background-color: rgba(0, 204, 255, 0.4);
+    color: #fff;
+    font-weight: bold;
+}
+
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+}
+
+.dropdown-fade-enter-active,
+.dropdown-fade-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-fade-enter-from,
+.dropdown-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
 }
 
 .start-btn {
@@ -346,8 +498,9 @@ const startGame = () => {
         gap: 8px;
     }
     
-    .custom-select {
+    .custom-dropdown {
         width: 100%;
+        max-width: none;
     }
 
     .start-btn {

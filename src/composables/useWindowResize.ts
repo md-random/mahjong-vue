@@ -25,7 +25,8 @@ export const useWindowResize = () => {
         const widthScale = (windowWidth.value - 20) / baseWidth;
         const heightScale = (windowHeight.value - headerBuffer) / baseHeight;
 
-        return Math.max(0.1, Math.min(widthScale, heightScale, 1));
+        // Removed upper limit of 1 to allow scaling up on tablets/large screens
+        return Math.max(0.1, Math.min(widthScale, heightScale));
     });
     
     return {

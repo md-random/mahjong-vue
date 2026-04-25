@@ -1,12 +1,14 @@
 <template>
 <div id="app-container" class="app-container">
+    <RotateDeviceOverlay />
+    <IntroVideo v-if="store.gameState === 'intro'" />
     <BackgroundLayer 
         v-if="store.gameState === 'playing'"
         :bg-image="currentConfig.bg" 
         :bg-position="currentConfig.bgPosition || 'center center'" 
     />
     
-    <PondRipple v-if="store.gameState === 'start'" />
+    <PondRipple v-if="['start', 'intro'].includes(store.gameState)" />
     
     <AppHeader />
 
@@ -28,6 +30,8 @@
 import { useGameStore } from './stores/gameStore';
 import { useWindowResize } from './composables/useWindowResize';
 import { useDynamicBackground } from './composables/useDynamicBackground';
+import RotateDeviceOverlay from './components/RotateDeviceOverlay.vue';
+import IntroVideo from './components/IntroVideo.vue';
 import GameBoard from './components/GameBoard.vue';
 import StartScreen from './components/StartScreen.vue';
 import AppHeader from './components/AppHeader.vue';
