@@ -6,10 +6,13 @@ A responsive, web-based Mahjong Solitaire game built with Vue 3, Vite, and TypeS
 
 - **Brand Experience**: Features a fully integrated MP4 intro video establishing the "Fool Enterprises" gaming universe, seamlessly fading into the main game UI.
 - **Multiple Layouts**: Custom dropdown menu (using Vue `<Teleport>`) to choose between "Classic Turtle", "Deep Well", and "Eight Stacks" tile formations.
+- **Persistent Save States**: Games are automatically saved to `localStorage`. If you leave the page or refresh, a "Resume Game" prompt allows you to pick up exactly where you left off.
+- **Deadlock Detection**: The game proactively detects when no valid moves remain, immediately presenting a custom "DEADLOCK DETECTED" cyberpunk overlay so you don't waste time searching.
+- **Time-Reversal Undo**: A custom Yin/Yang SVG button allows you to infinitely undo your previous moves to recover from mistakes.
+- **Tactile 3D Feedback**: Tiles physically "pop" up via Z-axis CSS transformations when selected, providing satisfying physical feedback.
 - **Landscape-First Responsive Design**: The game board scales dynamically to fit on any screen size. For mobile devices, it features a custom CSS orientation lock (`RotateDeviceOverlay`) that forces the game into landscape mode for optimal playability.
-- **Dynamic Backgrounds**: The game features context-aware dynamic backgrounds with advanced pure CSS masking effects (like the 7-ring water ripple on the start screen and soft-beveled video masks).
-- **Game State Management**: Robust state handling powered by Pinia, managing tile visibility, matching logic, and hint systems.
-- **Hint System**: Built-in hint system to help you find available moves when you're stuck.
+- **Dynamic Backgrounds**: Context-aware dynamic backgrounds feature advanced pure CSS masking effects (like a 7-ring water ripple on the start screen and soft-beveled video masks).
+- **State Management**: Robust state handling powered by Pinia, managing tile visibility, matching logic, and history trackers.
 
 ## Tech Stack
 

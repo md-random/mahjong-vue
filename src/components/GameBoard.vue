@@ -16,6 +16,14 @@
                 </div>
             </div>
         </template>
+
+        <div v-if="['win', 'deadlock'].includes(store.gameState)" class="win-fail-overlay">
+            <div class="overlay-content">
+                <h1 v-if="store.gameState === 'win'" class="overlay-title win-title">MISSION ACCOMPLISHED</h1>
+                <h1 v-if="store.gameState === 'deadlock'" class="overlay-title fail-title">DEADLOCK DETECTED</h1>
+                <button class="overlay-btn" @click="store.restartGame">RESTART SIMULATION</button>
+            </div>
+        </div>
     </section>
 </template>
 
@@ -95,6 +103,8 @@ const onClickTile = (tileState: TileState) => {
     );
     box-shadow: var(--neon-glow-magenta);
     border-color: #fff;
+    transform: translateY(-8px) scale(1.05);
+    z-index: 100;
 }
 
 .alertTile {
@@ -121,5 +131,71 @@ const onClickTile = (tileState: TileState) => {
 .tile img {
     width: 100%;
     height: 100%;
+}
+
+.win-fail-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 5, 15, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border-radius: 5px;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 40px;
+    border: 2px solid #00ccff;
+    background: rgba(0, 20, 40, 0.9);
+    box-shadow: 0 0 30px rgba(0, 204, 255, 0.4), inset 0 0 20px rgba(0, 204, 255, 0.2);
+    border-radius: 10px;
+}
+
+.overlay-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(24px, 4vw, 42px);
+    margin: 0 0 30px 0;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.win-title {
+    color: #00ffcc;
+}
+
+.fail-title {
+    color: #ff0055;
+}
+
+.overlay-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 30px;
+    background: transparent;
+    color: #00ccff;
+    border: 1px solid #00ccff;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.2);
+}
+
+.overlay-btn:hover {
+    background: rgba(0, 204, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.6);
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 </style>

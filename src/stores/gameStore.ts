@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Coordinate, TileData, TileState } from '../types/game';
 import { LAYOUTS, isOpen } from '../utils/coordinates';
 import { generateTileDataMap } from '../utils/images';
@@ -10,8 +10,47 @@ export const useGameStore = defineStore('game', () => {
     const tilesState = ref<TileState[]>([]);
     const selectedCoords = ref<Coordinate | null>(null);
     const hintCoord = ref<Coordinate | null>(null);
-    const gameState = ref<'intro' | 'start' | 'playing'>('intro');
+    const gameState = ref<'intro' | 'start' | 'playing' | 'win' | 'deadlock'>('intro');
     const currentLayoutName = ref<string>('Classic Turtle');
+    const moveHistory = ref<[Coordinate, Coordinate][]>([]);
+
+    const hasSavedGame = ref(false);
+
+    const savedState = localStorage.getItem('mahjongGameState');
+    if (savedState) {
+        hasSavedGame.value = true;
+    }
+
+    const resumeGame = () => {
+        const saved = localStorage.getItem('mahjongGameState');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed.currentLayoutName) currentLayoutName.value = parsed.currentLayoutName;
+                if (parsed.tilesState) tilesState.value = parsed.tilesState;
+                if (parsed.moveHistory) moveHistory.value = parsed.moveHistory;
+                if (parsed.gameState) gameState.value = parsed.gameState;
+                
+                updateOpenStatus();
+                checkMovePossible("Game Resumed");
+            } catch (e) {
+                console.error("Failed to parse saved state", e);
+            }
+        }
+    };
+
+    watch([gameState, currentLayoutName, tilesState, moveHistory], () => {
+        if (['playing', 'deadlock'].includes(gameState.value)) {
+            localStorage.setItem('mahjongGameState', JSON.stringify({
+                gameState: gameState.value,
+                currentLayoutName: currentLayoutName.value,
+                tilesState: tilesState.value,
+                moveHistory: moveHistory.value
+            }));
+        } else if (gameState.value === 'win') {
+            localStorage.removeItem('mahjongGameState');
+        }
+    }, { deep: true });
 
     const currentCoords = computed<Coordinate[]>(() => 
         tilesState.value.filter(t => !t.hidden).map(t => t.coord)
@@ -24,6 +63,7 @@ export const useGameStore = defineStore('game', () => {
     const startGame = async (layoutName: string = 'Classic Turtle') => {
         gameState.value = 'playing';
         currentLayoutName.value = layoutName;
+        moveHistory.value = [];
         const rawTileData = generateTileDataMap();
         shuffle(rawTileData);
         
@@ -89,6 +129,9 @@ export const useGameStore = defineStore('game', () => {
         
         if (moves.length === 0) {
             writeStatus("There are no moves left. Gameover. 🚧");
+            if (currentCoords.value.length > 0) {
+                gameState.value = 'deadlock';
+            }
         } else if (moves.length === 1) {
             writeStatus("There is <strong>exactly one</strong> possible move.");
         } else {
@@ -111,10 +154,13 @@ export const useGameStore = defineStore('game', () => {
         tile2.hidden = true;
         tile2.selected = false;
 
+        moveHistory.value.push([tile1.coord, tile2.coord]);
+
         updateOpenStatus();
 
         if (currentCoords.value.length === 0) {
             writeStatus("You won! 🎉");
+            gameState.value = 'win';
         } else {
             await checkMovePossible("Computing...");
         }
@@ -172,6 +218,28 @@ export const useGameStore = defineStore('game', () => {
         await startGame(currentLayoutName.value);
     };
 
+    const undoMove = async () => {
+        if (moveHistory.value.length === 0) return;
+        
+        const lastMove = moveHistory.value.pop();
+        if (lastMove) {
+            const t1 = getTileByCoord(lastMove[0]);
+            const t2 = getTileByCoord(lastMove[1]);
+            
+            if (t1 && t2) {
+                t1.hidden = false;
+                t2.hidden = false;
+                
+                if (gameState.value === 'deadlock') {
+                    gameState.value = 'playing';
+                }
+                
+                updateOpenStatus();
+                await checkMovePossible("Undo successful.");
+            }
+        }
+    };
+
     return {
         statusText,
         tilesState,
@@ -184,6 +252,10 @@ export const useGameStore = defineStore('game', () => {
         returnToMenu,
         selectTileAt,
         triggerHint,
-        restartGame
+        restartGame,
+        undoMove,
+        moveHistory,
+        hasSavedGame,
+        resumeGame
     };
 });

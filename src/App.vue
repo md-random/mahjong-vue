@@ -3,7 +3,7 @@
     <RotateDeviceOverlay />
     <IntroVideo v-if="store.gameState === 'intro'" />
     <BackgroundLayer 
-        v-if="store.gameState === 'playing'"
+        v-if="['playing', 'deadlock', 'win'].includes(store.gameState)"
         :bg-image="currentConfig.bg" 
         :bg-position="currentConfig.bgPosition || 'center center'" 
     />
@@ -12,7 +12,7 @@
     
     <AppHeader />
 
-    <div v-if="store.gameState === 'playing'" class="scale-container" :style="{ width: `${1000 * appScale}px`, height: `${700 * appScale}px` }">
+    <div v-if="['playing', 'deadlock', 'win'].includes(store.gameState)" class="scale-container" :style="{ width: `${1000 * appScale}px`, height: `${700 * appScale}px` }">
         <div id="wrapper" class="app-wrapper" :style="{ transform: `scale(${appScale})` }">
             <main class="main-content">
                 <GameBoard />

@@ -21,9 +21,14 @@
                 </div>
             </div>
             
-            <button class="start-btn" @click="startGame">
-                START GAME
-            </button>
+            <div class="button-group">
+                <button v-if="store.hasSavedGame" class="start-btn resume-btn" @click="store.resumeGame()">
+                    RESUME GAME
+                </button>
+                <button class="start-btn" @click="startGame">
+                    START NEW GAME
+                </button>
+            </div>
         </div>
 
         <div class="rules-section">
@@ -55,6 +60,7 @@
                 <p><strong>Objective:</strong> Select two identical tiles to remove them. Once all tiles are removed, the game is won.</p>
                 <p><strong>Valid Moves:</strong> Only <em>open</em> tiles can be selected. A tile is open if it is on top (not covered by any other tile) and at least one of its sides (left or right) is completely free.</p>
                 <p><strong>Special Matches:</strong> There are 4 Seasons and 4 Flowers in the game. Any Season tile can match with any other Season tile, and any Flower tile can match with any other Flower tile. They do not have to be exactly identical.</p>
+                <p><strong>Undo Mistakes:</strong> Click the Yin/Yang symbol at the top of the screen to reverse time and undo your last move. You can undo as many times as you like!</p>
             </div>
             <button class="close-btn" @click="showRulesModal = false">CLOSE</button>
         </div>
@@ -346,6 +352,14 @@ const startGame = () => {
     transform: translateY(-10px);
 }
 
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    align-items: center;
+}
+
 .start-btn {
     font-family: 'Orbitron', sans-serif;
     font-size: clamp(13px, 2.4vh, 19px);
@@ -368,6 +382,19 @@ const startGame = () => {
     background-color: var(--button-hover-color);
     color: #fff;
     border-color: #fff;
+}
+
+.resume-btn {
+    background-color: transparent;
+    border: 1px solid #00ccff;
+    color: #00ccff;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.2);
+}
+
+.resume-btn:hover {
+    background-color: rgba(0, 204, 255, 0.2);
+    border-color: #00ccff;
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
     box-shadow: 0 0 20px rgba(0, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 0.8);
     text-shadow: 0 0 4px #fff;
 }
