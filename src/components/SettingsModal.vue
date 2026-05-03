@@ -23,7 +23,16 @@
 
             <div class="settings-section">
                 <h2 class="section-title">AUDIO OPTIONS</h2>
-                <div class="placeholder-text">Music & Sound Effects Coming Soon...</div>
+                <div class="track-list">
+                    <div v-for="track in audioStore.allTracks" :key="track.id" class="track-item" :class="{ disabled: !audioStore.enabledTracks.includes(track.id) }">
+                        <img :src="track.thumbnail" :alt="track.title" class="track-thumb" />
+                        <span class="track-title">{{ track.title }}</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" :checked="audioStore.enabledTracks.includes(track.id)" @change="audioStore.toggleTrackEnabled(track.id)" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-actions">
@@ -35,8 +44,10 @@
 
 <script setup lang="ts">
 import { useGameStore } from '../stores/gameStore';
+import { useAudioStore } from '../stores/audioStore';
 
 const store = useGameStore();
+const audioStore = useAudioStore();
 </script>
 
 <style scoped>
@@ -126,13 +137,89 @@ const store = useGameStore();
     opacity: 0.8;
 }
 
-.placeholder-text {
-    font-family: 'Share Tech Mono', monospace;
-    color: #fff;
+.track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background: rgba(0, 204, 255, 0.05);
+    border: 1px solid rgba(0, 204, 255, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.track-item.disabled {
     opacity: 0.5;
-    font-style: italic;
-    text-align: center;
-    padding: 10px 0;
+    filter: grayscale(80%);
+}
+
+.track-thumb {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #00ccff;
+}
+
+.track-title {
+    flex: 1;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: .4s;
+    border-radius: 24px;
+    border: 1px solid rgba(0, 204, 255, 0.3);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #00ccff;
+    box-shadow: 0 0 10px #00ccff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
 }
 
 .modal-actions {

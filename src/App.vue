@@ -24,14 +24,17 @@
         <StartScreen />
     </main>
 
+    <AudioPlayer v-if="['playing', 'deadlock'].includes(store.gameState)" />
+
     <ConfirmModal v-if="store.confirmModal.show" />
     <SettingsModal v-if="store.showSettingsModal" />
 </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
 import { useGameStore } from './stores/gameStore';
+import { useAudioStore } from './stores/audioStore';
 import { useWindowResize } from './composables/useWindowResize';
 import { useDynamicBackground } from './composables/useDynamicBackground';
 import RotateDeviceOverlay from './components/RotateDeviceOverlay.vue';
@@ -43,8 +46,16 @@ import BackgroundLayer from './components/BackgroundLayer.vue';
 import PondRipple from './components/PondRipple.vue';
 import ConfirmModal from './components/ConfirmModal.vue';
 import SettingsModal from './components/SettingsModal.vue';
+import AudioPlayer from './components/AudioPlayer.vue';
 
 const store = useGameStore();
+const audioStore = useAudioStore();
+
+watch(() => store.gameState, (newVal) => {
+    if ((newVal === 'start' || newVal === 'playing') && !audioStore.isPlaying) {
+        audioStore.play();
+    }
+});
 
 const { appScale } = useWindowResize();
 
