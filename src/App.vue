@@ -23,10 +23,14 @@
     <main v-if="store.gameState === 'start'" class="start-main-content">
         <StartScreen />
     </main>
+
+    <ConfirmModal v-if="store.confirmModal.show" />
+    <SettingsModal v-if="store.showSettingsModal" />
 </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue';
 import { useGameStore } from './stores/gameStore';
 import { useWindowResize } from './composables/useWindowResize';
 import { useDynamicBackground } from './composables/useDynamicBackground';
@@ -37,12 +41,51 @@ import StartScreen from './components/StartScreen.vue';
 import AppHeader from './components/AppHeader.vue';
 import BackgroundLayer from './components/BackgroundLayer.vue';
 import PondRipple from './components/PondRipple.vue';
+import ConfirmModal from './components/ConfirmModal.vue';
+import SettingsModal from './components/SettingsModal.vue';
 
 const store = useGameStore();
 
 const { appScale } = useWindowResize();
 
 const { currentConfig } = useDynamicBackground(() => store.currentLayoutName);
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+        if (store.showSettingsModal) {
+            store.showSettingsModal = false;
+            return;
+        }
+        if (store.confirmModal.show) {
+            store.cancelConfirmAction();
+            return;
+        }
+        if (['playing', 'deadlock'].includes(store.gameState)) {
+            store.triggerConfirmAction('menu');
+        }
+    }
+    
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        if (['playing', 'deadlock'].includes(store.gameState) && !store.confirmModal.show && !store.showSettingsModal) {
+            e.preventDefault();
+            store.undoMove();
+        }
+    }
+    
+    if (e.key.toLowerCase() === 'h' && !e.ctrlKey && !e.metaKey) {
+        if (['playing', 'deadlock'].includes(store.gameState) && !store.confirmModal.show && !store.showSettingsModal) {
+            store.triggerHint();
+        }
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style>

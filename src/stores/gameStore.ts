@@ -16,6 +16,27 @@ export const useGameStore = defineStore('game', () => {
 
     const hasSavedGame = ref(false);
 
+    const showSettingsModal = ref(false);
+    const confirmModal = ref<{ show: boolean; action: 'restart' | 'menu' | null }>({ show: false, action: null });
+
+    const triggerConfirmAction = (action: 'restart' | 'menu') => {
+        confirmModal.value = { show: true, action };
+    };
+
+    const cancelConfirmAction = () => {
+        confirmModal.value = { show: false, action: null };
+    };
+
+    const executeConfirmAction = async () => {
+        const action = confirmModal.value.action;
+        confirmModal.value = { show: false, action: null };
+        if (action === 'restart') {
+            await restartGame();
+        } else if (action === 'menu') {
+            returnToMenu();
+        }
+    };
+
     const savedState = localStorage.getItem('mahjongGameState');
     if (savedState) {
         hasSavedGame.value = true;
@@ -256,6 +277,11 @@ export const useGameStore = defineStore('game', () => {
         undoMove,
         moveHistory,
         hasSavedGame,
-        resumeGame
+        resumeGame,
+        showSettingsModal,
+        confirmModal,
+        triggerConfirmAction,
+        cancelConfirmAction,
+        executeConfirmAction
     };
 });

@@ -8,7 +8,7 @@ A responsive, web-based Mahjong Solitaire game built with Vue 3, Vite, and TypeS
 - **Multiple Layouts**: Custom dropdown menu (using Vue `<Teleport>`) to choose between "Classic Turtle", "Deep Well", and "Eight Stacks" tile formations.
 - **Persistent Save States**: Games are automatically saved to `localStorage`. If you leave the page or refresh, a "Resume Game" prompt allows you to pick up exactly where you left off.
 - **Deadlock Detection**: The game proactively detects when no valid moves remain, immediately presenting a custom "DEADLOCK DETECTED" cyberpunk overlay so you don't waste time searching.
-- **Time-Reversal Undo**: A custom Yin/Yang SVG button allows you to infinitely undo your previous moves to recover from mistakes.
+- **Unified Navigation & Infinite Undo**: A responsive header featuring custom animated SVG icons for Hint, Restart, Menu controls, and an Undo button that allows you to infinitely reverse previous moves to recover from mistakes. All buttons feature complex hover animations and monospace labeling for a polished user experience.
 - **Tactile 3D Feedback**: Tiles physically "pop" up via Z-axis CSS transformations when selected, providing satisfying physical feedback.
 - **Landscape-First Responsive Design**: The game board scales dynamically to fit on any screen size. For mobile devices, it features a custom CSS orientation lock (`RotateDeviceOverlay`) that forces the game into landscape mode for optimal playability.
 - **Dynamic Backgrounds**: Context-aware dynamic backgrounds feature advanced pure CSS masking effects (like a 7-ring water ripple on the start screen and soft-beveled video masks).
