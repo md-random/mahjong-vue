@@ -9,7 +9,9 @@ A responsive, web-based Mahjong Solitaire game built with Vue 3, Vite, and TypeS
 - **Persistent Save States**: Games are automatically saved to `localStorage`. If you leave the page or refresh, a "Resume Game" prompt allows you to pick up exactly where you left off.
 - **Deadlock Detection**: The game proactively detects when no valid moves remain, immediately presenting a custom "DEADLOCK DETECTED" cyberpunk overlay so you don't waste time searching.
 - **Immersive Audio Engine**: Dynamic background music system featuring a custom YouTube-style slide-out control panel with a volume slider. The engine respects browser auto-play policies and seamlessly activates upon entering gameplay.
-- **Interactive Settings Hub**: A central modal allowing players to curate their active music rotation playlist (featuring auto-extracted video thumbnails) and view game options.
+- **Interactive Settings Hub**: A central modal allowing players to curate their active music rotation playlist (featuring auto-extracted video thumbnails), toggle SFX, and view game options.
+- **Synthesized SFX Engine**: A custom built, zero-latency audio synthesizer using the native browser Web Audio API to generate soft, luxurious interaction sounds (clicks, chimes, and buzzers) dynamically without external audio assets.
+- **Cyber-Glitch Match Animations**: Matching tiles trigger a high-impact, 500ms CSS-driven `@keyframes` glitch animation (scaling, glowing, and skewing) before being securely purged from the board via precise reactive state management.
 - **Accessibility & Keyboard Support**: Full keyboard shortcut integration for rapid play—Undo (`Ctrl+Z`), Hint (`H`), and menu navigation (`Esc`). 
 - **Unified Navigation & Infinite Undo**: A responsive header featuring custom animated SVG icons for Hint, Restart, Menu controls, Options, and an Undo button that allows you to infinitely reverse previous moves to recover from mistakes. All buttons feature complex hover animations and monospace labeling for a polished user experience.
 - **Tactile 3D Feedback**: Tiles physically "pop" up via Z-axis CSS transformations when selected, providing satisfying physical feedback.

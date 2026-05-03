@@ -9,12 +9,12 @@ export interface Track {
 }
 
 export const allTracks: Track[] = [
-    { id: 'click', title: 'Click of the Final Tile', audioFile: '/audio/Click_of_the_Final_Tile.mp3', thumbnail: '/images/thumbnails/Click_of_the_Final_Tile.png' },
     { id: 'porcelain', title: 'Porcelain Velocity', audioFile: '/audio/Porcelain_Velocity.mp3', thumbnail: '/images/thumbnails/Porcelain_Velocity.png' },
     { id: 'seven', title: 'Seven Tiles One Bullet', audioFile: '/audio/Seven_Tiles_One_Bullet.mp3', thumbnail: '/images/thumbnails/Seven_Tiles_One_Bullet.png' },
     { id: 'last', title: 'The Last Mahjong Hand', audioFile: '/audio/The_Last_Mahjong_Hand.mp3', thumbnail: '/images/thumbnails/The_Last_Mahjong_Hand.png' },
     { id: 'titanium', title: 'Titanium Spur', audioFile: '/audio/Titanium_Spur.mp3', thumbnail: '/images/thumbnails/Titanium_Spur.png' },
-    { id: 'twelve', title: 'Twelve Tiles Falling', audioFile: '/audio/Twelve_Tiles_Falling.mp3', thumbnail: '/images/thumbnails/Twelve_Tiles_Falling.png' }
+    { id: 'twelve', title: 'Twelve Tiles Falling', audioFile: '/audio/Twelve_Tiles_Falling.mp3', thumbnail: '/images/thumbnails/Twelve_Tiles_Falling.png' },
+    { id: 'click', title: 'Click of the Final Tile', audioFile: '/audio/Click_of_the_Final_Tile.mp3', thumbnail: '/images/thumbnails/Click_of_the_Final_Tile.png' }
 ];
 
 export const useAudioStore = defineStore('audio', () => {
@@ -28,7 +28,11 @@ export const useAudioStore = defineStore('audio', () => {
     // Load preferences
     const savedEnabled = localStorage.getItem('mahjong_audio_enabled');
     if (savedEnabled) {
-        try { enabledTracks.value = JSON.parse(savedEnabled); } catch(e){}
+        try { 
+            const parsed = JSON.parse(savedEnabled); 
+            // Filter allTracks by parsed IDs to maintain the strict hardcoded order
+            enabledTracks.value = allTracks.map(t => t.id).filter(id => parsed.includes(id));
+        } catch(e){}
     }
     const savedVolume = localStorage.getItem('mahjong_audio_volume');
     if (savedVolume) {
@@ -126,9 +130,10 @@ export const useAudioStore = defineStore('audio', () => {
     const toggleTrackEnabled = (id: string) => {
         const index = enabledTracks.value.indexOf(id);
         if (index === -1) {
-            enabledTracks.value.push(id);
-            // If nothing is playing and we just enabled something, maybe start it?
-            // Actually, let the user explicitly hit play.
+            // Enable it, but maintain the strict order defined by allTracks
+            const currentSet = new Set(enabledTracks.value);
+            currentSet.add(id);
+            enabledTracks.value = allTracks.map(t => t.id).filter(tId => currentSet.has(tId));
         } else {
             enabledTracks.value.splice(index, 1);
             if (currentTrackId.value === id && isPlaying.value) {

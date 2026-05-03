@@ -23,6 +23,15 @@
 
             <div class="settings-section">
                 <h2 class="section-title">AUDIO OPTIONS</h2>
+                <div class="sfx-toggle-wrapper">
+                    <span class="track-title" style="flex:1;">Sound Effects (SFX)</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" :checked="sfxStore.isEnabled" @change="sfxStore.toggleSfx" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <hr class="audio-divider" />
+                <h3 class="section-subtitle">Music Playlist Rotation</h3>
                 <div class="track-list">
                     <div v-for="track in audioStore.allTracks" :key="track.id" class="track-item" :class="{ disabled: !audioStore.enabledTracks.includes(track.id) }">
                         <img :src="track.thumbnail" :alt="track.title" class="track-thumb" />
@@ -45,9 +54,11 @@
 <script setup lang="ts">
 import { useGameStore } from '../stores/gameStore';
 import { useAudioStore } from '../stores/audioStore';
+import { useSfxStore } from '../stores/sfxStore';
 
 const store = useGameStore();
 const audioStore = useAudioStore();
+const sfxStore = useSfxStore();
 </script>
 
 <style scoped>
@@ -140,7 +151,35 @@ const audioStore = useAudioStore();
 .track-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.sfx-toggle-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(0, 30, 60, 0.4);
+    border: 1px solid rgba(0, 204, 255, 0.3);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.audio-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0, 204, 255, 0.5), transparent);
+    margin: 15px 0;
+}
+
+.section-subtitle {
+    color: #00ccff;
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .track-item {

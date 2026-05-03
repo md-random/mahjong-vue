@@ -4,6 +4,7 @@ import type { Coordinate, TileData, TileState } from '../types/game';
 import { LAYOUTS, isOpen } from '../utils/coordinates';
 import { generateTileDataMap } from '../utils/images';
 import { shuffle, randEl, sleep } from '../utils/gameUtils';
+import { useSfxStore } from './sfxStore';
 
 export const useGameStore = defineStore('game', () => {
     const statusText = ref<string>('');
@@ -167,13 +168,24 @@ export const useGameStore = defineStore('game', () => {
     };
 
     const executeMove = async (tile1: TileState, tile2: TileState) => {
+        const sfxStore = useSfxStore();
+        sfxStore.playChime();
+
         selectedCoords.value = null;
         hintCoord.value = null;
         
-        tile1.hidden = true;
         tile1.selected = false;
-        tile2.hidden = true;
         tile2.selected = false;
+        
+        tile1.animating = true;
+        tile2.animating = true;
+
+        await sleep(500);
+
+        tile1.animating = false;
+        tile2.animating = false;
+        tile1.hidden = true;
+        tile2.hidden = true;
 
         moveHistory.value.push([tile1.coord, tile2.coord]);
 
@@ -188,19 +200,27 @@ export const useGameStore = defineStore('game', () => {
     };
 
     const selectTileAt = (coord: Coordinate) => {
+        const sfxStore = useSfxStore();
         const tile = getTileByCoord(coord);
-        if (!tile || !tile.isOpen) return;
+        
+        if (!tile || !tile.isOpen) {
+            sfxStore.playBuzzer();
+            return;
+        }
 
         if (selectedCoords.value) {
             if (coord.toString() === selectedCoords.value.toString()) {
                 tile.selected = false;
                 selectedCoords.value = null;
+                sfxStore.playClack();
                 return;
             } else {
                 const selectedTile = getTileByCoord(selectedCoords.value);
                 if (selectedTile && tile.tileData.type === selectedTile.tileData.type) {
                     executeMove(tile, selectedTile);
                     return;
+                } else {
+                    sfxStore.playBuzzer();
                 }
             }
         }
@@ -211,6 +231,7 @@ export const useGameStore = defineStore('game', () => {
         }
         selectedCoords.value = coord;
         tile.selected = true;
+        sfxStore.playClack();
     };
 
     const triggerHint = async () => {
@@ -223,13 +244,15 @@ export const useGameStore = defineStore('game', () => {
         
         for (let i = 0; i < toggleNumber; i++) {
             setTimeout(() => {
-                tile.alerted = !tile.alerted;
+                if (tile) tile.alerted = !tile.alerted;
             }, toggleDelay * i);
         }
         
         setTimeout(() => {
-            tile.alerted = false;
-            selectTileAt(hintCoord.value!);
+            if (tile) tile.alerted = false;
+            if (hintCoord.value) {
+                selectTileAt(hintCoord.value);
+            }
         }, toggleDelay * toggleNumber);
     };
 

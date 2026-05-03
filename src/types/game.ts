@@ -13,4 +13,5 @@ export interface TileState {
   alerted: boolean;
   hidden: boolean;
   isOpen: boolean;
+  animating?: boolean;
 }

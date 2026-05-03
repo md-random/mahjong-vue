@@ -1,7 +1,7 @@
 <template>
     <section id="game" v-if="store.tilesState.length > 0">
         <template v-for="(tile, index) in store.tilesState" :key="index">
-            <div v-show="!tile.hidden" class="tile" :style="getTileStyle(tile)" :data-coord="tile.coord.toString()">
+            <div v-if="!tile.hidden" class="tile" :class="{ 'match-anim': tile.animating }" :style="getTileStyle(tile)" :data-coord="tile.coord.toString()">
                 <div class="tileBack"></div>
                 <div 
                     class="tileFront" 
@@ -197,5 +197,39 @@ const onClickTile = (tileState: TileState) => {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.match-anim {
+    animation: cyberGlitch 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+    z-index: 500 !important;
+    pointer-events: none;
+}
+
+@keyframes cyberGlitch {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
+    20% {
+        transform: scale(1.15) translateY(-10px);
+        filter: brightness(1.5) drop-shadow(0 0 15px #00ffff) hue-rotate(90deg);
+        opacity: 1;
+    }
+    40% {
+        transform: scale(1.1) translateY(-10px) skewX(10deg);
+        filter: brightness(2) drop-shadow(0 0 30px #00ffff);
+        opacity: 0.8;
+    }
+    60% {
+        transform: scale(1.2) translateY(-10px) skewX(-10deg);
+        filter: brightness(1.5) drop-shadow(0 0 20px #ff00ff) hue-rotate(-90deg);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0.1) translateY(-30px);
+        filter: brightness(3) drop-shadow(0 0 50px #ffffff);
+        opacity: 0;
+    }
 }
 </style>
