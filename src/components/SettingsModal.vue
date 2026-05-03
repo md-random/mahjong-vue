@@ -23,12 +23,12 @@
 
             <div class="settings-section">
                 <h2 class="section-title">AUDIO OPTIONS</h2>
-                <div class="sfx-toggle-wrapper">
-                    <span class="track-title" style="flex:1;">Sound Effects (SFX)</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" :checked="sfxStore.isEnabled" @change="sfxStore.toggleSfx" />
-                        <span class="slider"></span>
-                    </label>
+                <div class="sfx-slider-wrapper">
+                    <div class="slider-header">
+                        <span class="track-title">Sound Effects (SFX)</span>
+                        <span class="volume-readout">{{ Math.round(sfxStore.volume * 100) }}%</span>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" v-model.number="sfxStore.volume" class="volume-slider" />
                 </div>
                 <hr class="audio-divider" />
                 <h3 class="section-subtitle">Music Playlist Rotation</h3>
@@ -155,15 +155,57 @@ const sfxStore = useSfxStore();
     padding-right: 5px;
 }
 
-.sfx-toggle-wrapper {
+.sfx-slider-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
+    flex-direction: column;
+    padding: 15px;
     background: rgba(0, 30, 60, 0.4);
     border: 1px solid rgba(0, 204, 255, 0.3);
     border-radius: 8px;
     margin-bottom: 15px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.volume-readout {
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ccff;
+    font-size: 14px;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 204, 255, 0.2);
+    outline: none;
+    border-radius: 3px;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ccff;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00ccff;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ccff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px #00ccff;
 }
 
 .audio-divider {

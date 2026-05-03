@@ -2,20 +2,16 @@ import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
 export const useSfxStore = defineStore('sfx', () => {
-    const isEnabled = ref(true);
+    const volume = ref(1.0);
 
-    const savedEnabled = localStorage.getItem('mahjong_sfx_enabled');
-    if (savedEnabled !== null) {
-        isEnabled.value = savedEnabled === 'true';
+    const savedVolume = localStorage.getItem('mahjong_sfx_volume');
+    if (savedVolume !== null) {
+        volume.value = parseFloat(savedVolume);
     }
 
-    watch(isEnabled, (newVal) => {
-        localStorage.setItem('mahjong_sfx_enabled', newVal.toString());
+    watch(volume, (newVal) => {
+        localStorage.setItem('mahjong_sfx_volume', newVal.toString());
     });
-
-    const toggleSfx = () => {
-        isEnabled.value = !isEnabled.value;
-    };
 
     // Initialize AudioContext lazily so we don't break auto-play policies
     let audioCtx: AudioContext | null = null;
@@ -31,12 +27,15 @@ export const useSfxStore = defineStore('sfx', () => {
     };
 
     const playClack = () => {
-        if (!isEnabled.value) return;
+        if (volume.value === 0) return;
         try {
             const ctx = getAudioContext();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
+            
+            // Apply x^3 curve for natural logarithmic human volume perception
+            const v = Math.pow(volume.value, 3);
             
             // Use a triangle wave for a softer, wood-like tone
             osc.type = 'triangle';
@@ -48,10 +47,10 @@ export const useSfxStore = defineStore('sfx', () => {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(800, ctx.currentTime);
             
-            // Gentler attack and smoother release
+            // Gentler attack and smoother release, scaled by exponential volume
             gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+            gain.gain.linearRampToValueAtTime(0.4 * v, ctx.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.01 * v), ctx.currentTime + 0.12);
             
             osc.connect(filter);
             filter.connect(gain);
@@ -65,11 +64,13 @@ export const useSfxStore = defineStore('sfx', () => {
     };
 
     const playChime = () => {
-        if (!isEnabled.value) return;
+        if (volume.value === 0) return;
         try {
             const ctx = getAudioContext();
             const gain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
+            
+            const v = Math.pow(volume.value, 3);
             
             // Luxurious, ethereal major 7th chord (Amaj7)
             const frequencies = [440.00, 554.37, 659.25, 830.61]; 
@@ -77,10 +78,10 @@ export const useSfxStore = defineStore('sfx', () => {
             filter.type = 'lowpass';
             filter.frequency.setValueAtTime(1500, ctx.currentTime);
             
-            // Very soft, slow attack and long, luxurious fade
+            // Very soft, slow attack and long, luxurious fade, scaled by volume
             gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.1); // Smooth fade in
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5); // Long 1.5s fade out
+            gain.gain.linearRampToValueAtTime(0.15 * v, ctx.currentTime + 0.1); // Smooth fade in
+            gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.001 * v), ctx.currentTime + 1.5); // Long 1.5s fade out
             
             frequencies.forEach(freq => {
                 const osc = ctx.createOscillator();
@@ -103,12 +104,14 @@ export const useSfxStore = defineStore('sfx', () => {
     };
 
     const playBuzzer = () => {
-        if (!isEnabled.value) return;
+        if (volume.value === 0) return;
         try {
             const ctx = getAudioContext();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
+            
+            const v = Math.pow(volume.value, 3);
             
             // Soft sine wave instead of harsh sawtooth
             osc.type = 'sine';
@@ -118,10 +121,10 @@ export const useSfxStore = defineStore('sfx', () => {
             filter.type = 'lowpass';
             filter.frequency.value = 400; // Very muffled
             
-            // Soft, plush thud
+            // Soft, plush thud, scaled by volume
             gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            gain.gain.linearRampToValueAtTime(0.2 * v, ctx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.01 * v), ctx.currentTime + 0.2);
             
             osc.connect(filter);
             filter.connect(gain);
@@ -135,8 +138,7 @@ export const useSfxStore = defineStore('sfx', () => {
     };
 
     return {
-        isEnabled,
-        toggleSfx,
+        volume,
         playClack,
         playChime,
         playBuzzer
