@@ -1,6 +1,5 @@
 <template>
 <div id="app-container" class="app-container">
-    <RotateDeviceOverlay />
     <IntroVideo v-if="store.gameState === 'intro'" />
     <BackgroundLayer 
         v-if="['playing', 'deadlock', 'win'].includes(store.gameState)"
@@ -37,7 +36,6 @@ import { useGameStore } from './stores/gameStore';
 import { useAudioStore } from './stores/audioStore';
 import { useWindowResize } from './composables/useWindowResize';
 import { useDynamicBackground } from './composables/useDynamicBackground';
-import RotateDeviceOverlay from './components/RotateDeviceOverlay.vue';
 import IntroVideo from './components/IntroVideo.vue';
 import GameBoard from './components/GameBoard.vue';
 import StartScreen from './components/StartScreen.vue';
@@ -119,6 +117,20 @@ html, body {
     max-height: 100dvh;
     overflow: hidden;
     position: relative;
+}
+
+@media screen and (orientation: portrait) and (max-device-width: 1024px) {
+    .app-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100dvh !important;
+        height: 100dvw !important;
+        max-height: 100dvw !important;
+        transform: rotate(90deg);
+        transform-origin: top left;
+        margin-left: 100dvw;
+    }
 }
 
 .scale-container {

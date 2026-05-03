@@ -15,7 +15,7 @@ A responsive, web-based Mahjong Solitaire game built with Vue 3, Vite, and TypeS
 - **Accessibility & Keyboard Support**: Full keyboard shortcut integration for rapid play—Undo (`Ctrl+Z`), Hint (`H`), and menu navigation (`Esc`). 
 - **Unified Navigation & Infinite Undo**: A responsive header featuring custom animated SVG icons for Hint, Restart, Menu controls, Options, and an Undo button that allows you to infinitely reverse previous moves to recover from mistakes. All buttons feature complex hover animations and monospace labeling for a polished user experience.
 - **Tactile 3D Feedback**: Tiles physically "pop" up via Z-axis CSS transformations when selected, providing satisfying physical feedback.
-- **Landscape-First Responsive Design**: The game board and all custom UI overlays (Settings, Confirm Modals, Audio Panel) scale dynamically to fit on any screen size. For mobile devices, it features a custom CSS orientation lock (`RotateDeviceOverlay`) that forces the game into landscape mode for optimal playability.
+- **Landscape-First Responsive Design**: The game board and all custom UI overlays (Settings, Confirm Modals, Audio Panel) scale dynamically to fit on any screen size. For mobile devices in portrait mode, the application uses a dynamic CSS coordinate transformation matrix to forcefully render the game in landscape, seamlessly bypassing browser orientation-lock restrictions.
 - **Dynamic Backgrounds**: Context-aware dynamic backgrounds feature advanced pure CSS masking effects (like a 7-ring water ripple on the start screen and soft-beveled video masks).
 - **State Management**: Robust state handling powered by Pinia, managing tile visibility, matching logic, audio playlists, and history trackers.
 
