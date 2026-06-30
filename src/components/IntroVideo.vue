@@ -3,7 +3,7 @@
     <video
       ref="videoRef"
       class="intro-video"
-      src="/Fool_Enterprises_Brand_Prime.mp4"
+      src="/FoolLogoIntro.mp4"
       muted
       playsinline
       @loadedmetadata="onLoadedMetadata"
@@ -22,7 +22,6 @@ const fading = ref(false);
 
 const onLoadedMetadata = () => {
   if (videoRef.value) {
-    videoRef.value.currentTime = 2;
     videoRef.value.play().catch((err) => {
       console.warn("Autoplay was prevented.", err);
       completeIntro();
@@ -49,7 +48,7 @@ const completeIntro = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: transparent;
+  background-color: #000;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +65,6 @@ const completeIntro = () => {
 .intro-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  clip-path: inset(0.5% 1.5% 1.5% 0.5% round 15%);
+  object-fit: contain;
 }
 </style>

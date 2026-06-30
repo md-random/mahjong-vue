@@ -14,7 +14,9 @@ export const allTracks: Track[] = [
     { id: 'last', title: 'The Last Mahjong Hand', audioFile: '/audio/The_Last_Mahjong_Hand.mp3', thumbnail: '/images/thumbnails/The_Last_Mahjong_Hand.png' },
     { id: 'titanium', title: 'Titanium Spur', audioFile: '/audio/Titanium_Spur.mp3', thumbnail: '/images/thumbnails/Titanium_Spur.png' },
     { id: 'twelve', title: 'Twelve Tiles Falling', audioFile: '/audio/Twelve_Tiles_Falling.mp3', thumbnail: '/images/thumbnails/Twelve_Tiles_Falling.png' },
-    { id: 'click', title: 'Click of the Final Tile', audioFile: '/audio/Click_of_the_Final_Tile.mp3', thumbnail: '/images/thumbnails/Click_of_the_Final_Tile.png' }
+    { id: 'click', title: 'Click of the Final Tile', audioFile: '/audio/Click_of_the_Final_Tile.mp3', thumbnail: '/images/thumbnails/Click_of_the_Final_Tile.png' },
+    { id: 'seven_left', title: 'Seven Tiles Left', audioFile: '/audio/Seven_Tiles_Left.mp3', thumbnail: '/images/thumbnails/Seven_Tiles_Left.png' },
+    { id: 'last_down', title: 'The Last Tile Down', audioFile: '/audio/The_Last_Tile_Down.mp3', thumbnail: '/images/thumbnails/The_Last_Tile_Down.png' }
 ];
 
 export const useAudioStore = defineStore('audio', () => {
