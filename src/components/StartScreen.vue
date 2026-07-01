@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue';
+import { ref, onUnmounted, type CSSProperties } from 'vue';
 import { useGameStore } from '../stores/gameStore';
 import { useAudioStore } from '../stores/audioStore';
 import { LAYOUTS } from '../utils/coordinates';
@@ -85,7 +85,7 @@ const availableLayouts = Object.keys(LAYOUTS);
 const showRulesModal = ref(false);
 const isDropdownOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
-const dropdownStyle = ref({ top: '0px', left: '0px', width: '0px' });
+const dropdownStyle = ref<CSSProperties>({ top: '0px', left: '0px', width: '0px' });
 
 const closeDropdown = () => {
     isDropdownOpen.value = false;

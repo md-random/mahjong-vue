@@ -32,13 +32,24 @@ export const useAudioStore = defineStore('audio', () => {
     if (savedEnabled) {
         try { 
             const parsed = JSON.parse(savedEnabled); 
-            // Filter allTracks by parsed IDs to maintain the strict hardcoded order
-            enabledTracks.value = allTracks.map(t => t.id).filter(id => parsed.includes(id));
+            if (Array.isArray(parsed)) {
+                // Filter allTracks by parsed IDs to maintain the strict hardcoded order
+                const filtered = allTracks.map(t => t.id).filter(id => parsed.includes(id));
+                if (filtered.length > 0) {
+                    enabledTracks.value = filtered;
+                } else {
+                    // Fallback to all tracks if no matching tracks are enabled
+                    enabledTracks.value = allTracks.map(t => t.id);
+                }
+            }
         } catch(e){}
     }
     const savedVolume = localStorage.getItem('mahjong_audio_volume');
     if (savedVolume) {
-        volume.value = parseFloat(savedVolume);
+        const parsedVolume = parseFloat(savedVolume);
+        if (!isNaN(parsedVolume)) {
+            volume.value = parsedVolume;
+        }
     }
     
     let audioEl = new Audio();
@@ -71,7 +82,9 @@ export const useAudioStore = defineStore('audio', () => {
         }
         
         const nextTrackId = enabledTracks.value[nextIndex];
-        playTrack(nextTrackId);
+        if (nextTrackId) {
+            playTrack(nextTrackId);
+        }
     };
     
     audioEl.addEventListener('ended', playNext);
@@ -97,7 +110,10 @@ export const useAudioStore = defineStore('audio', () => {
     
     const play = () => {
         if (!currentTrackId.value && enabledTracks.value.length > 0) {
-            playTrack(enabledTracks.value[0]);
+            const firstTrack = enabledTracks.value[0];
+            if (firstTrack) {
+                playTrack(firstTrack);
+            }
         } else if (currentTrackId.value) {
             audioEl.play().then(() => {
                 isPlaying.value = true;
